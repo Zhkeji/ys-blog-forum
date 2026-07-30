@@ -421,6 +421,39 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
 .filter-tag{padding:4px 12px;background:var(--hover);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:0.2s}
 .filter-tag:hover,.filter-tag.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
+
+/* Live2D 看板娘 */
+#live2d-widget{position:fixed;bottom:10px;left:10px;z-index:99;opacity:0.8;transition:opacity 0.3s}
+#live2d-widget:hover{opacity:1}
+#live2d-widget canvas{cursor:pointer}
+
+/* 背景自定义 */
+.custom-bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.custom-bg img,.custom-bg video{width:100%;height:100%;object-fit:cover}
+.custom-bg .overlay{position:absolute;inset:0;background:rgba(0,0,0,0.3)}
+
+/* 关于页面 */
+.about-page{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.about-page h2{font-size:20px;margin-bottom:12px}
+.about-page p{font-size:14px;line-height:1.6;color:var(--text-light);margin-bottom:12px}
+.about-page .skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.about-page .skill{padding:4px 12px;background:var(--hover);border-radius:20px;font-size:12px}
+
+/* 追番页面 */
+.anime-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.anime-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:0.2s}
+.anime-card:hover{box-shadow:var(--shadow)}
+.anime-card img{width:100%;height:200px;object-fit:cover}
+.anime-card .info{padding:10px}
+.anime-card .title{font-size:13px;font-weight:600;margin-bottom:4px}
+.anime-card .status{font-size:11px;padding:2px 6px;border-radius:4px}
+
+/* 日记页面 */
+.diary-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.diary-item .date{font-size:12px;color:var(--text-light);margin-bottom:8px}
+.diary-item .content{font-size:14px;line-height:1.6;color:var(--text)}
+.diary-item .mood{font-size:20px;margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -928,7 +961,7 @@ function submitFriendLink(){
 function renderPag(pag){var c=$('pagination');if(!pag||pag.totalPages<=1){c.innerHTML='';return;}var h='';if(pag.page>1)h+='<button onclick="goPage('+(pag.page-1)+')">上一页</button>';for(var i=Math.max(1,pag.page-2);i<=Math.min(pag.totalPages,pag.page+2);i++){var active=i===pag.page;h+='<button class="'+(active?'active':'')+'" onclick="goPage('+i+')">'+i+'</button>';}if(pag.page<pag.totalPages)h+='<button onclick="goPage('+(pag.page+1)+')">下一页</button>';c.innerHTML=h;}
 function goPage(p){PAGE=p;loadPosts(true);window.scrollTo({top:0,behavior:'smooth'});}
 $('mainPage').style.display='block';
-loadCategories();loadBlogPosts(true);loadSidebar();loadAnnouncements();loadSiteFooter();setTimeout(typeWriter,1000);initMusicPlayer();loadWeather();
+loadCategories();loadBlogPosts(true);loadSidebar();loadAnnouncements();loadSiteFooter();setTimeout(typeWriter,1000);initMusicPlayer();loadWeather();initLive2D();
 if(TOKEN){api('GET','/api/auth/me',null,function(err,d){if(err||d.code!==200||!d.data.user){localStorage.removeItem('token');TOKEN=null;} else { USER=d.data.user;enterSite();}});}
 
 // === 新增功能 ===
@@ -1228,6 +1261,109 @@ function checkOutdated(createdAt) {
 }
 
 
+
+// Live2D 看板娘（简化版）
+function initLive2D() {
+  var container = document.getElementById('live2d-widget');
+  if (!container) return;
+  // Create a simple animated character
+  container.innerHTML = '<canvas width="150" height="200" style="border-radius:50%"></canvas>';
+  var canvas = container.querySelector('canvas');
+  var ctx = canvas.getContext('2d');
+  
+  function drawCharacter() {
+    ctx.clearRect(0, 0, 150, 200);
+    // Simple character drawing
+    ctx.fillStyle = '#ffb7c5';
+    ctx.beginPath();
+    ctx.arc(75, 80, 40, 0, Math.PI * 2);
+    ctx.fill();
+    // Eyes
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(60, 75, 5, 0, Math.PI * 2);
+    ctx.arc(90, 75, 5, 0, Math.PI * 2);
+    ctx.fill();
+    // Smile
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(75, 85, 15, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
+    // Body
+    ctx.fillStyle = '#ffb7c5';
+    ctx.beginPath();
+    ctx.ellipse(75, 150, 30, 40, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  drawCharacter();
+  
+  // Simple animation
+  var angle = 0;
+  setInterval(function() {
+    angle += 0.05;
+    canvas.style.transform = 'translateY(' + Math.sin(angle) * 5 + 'px)';
+  }, 50);
+}
+
+// 背景自定义
+function setCustomBackground(type, url) {
+  var bg = document.getElementById('customBg');
+  if (!bg) {
+    bg = document.createElement('div');
+    bg.id = 'customBg';
+    bg.className = 'custom-bg';
+    document.body.prepend(bg);
+  }
+  
+  if (type === 'image') {
+    bg.innerHTML = '<img src="' + url + '" alt="background"><div class="overlay"></div>';
+  } else if (type === 'video') {
+    bg.innerHTML = '<video autoplay muted loop><source src="' + url + '"></video><div class="overlay"></div>';
+  } else if (type === 'gradient') {
+    bg.innerHTML = '<div style="position:absolute;inset:0;background:' + url + '"></div><div class="overlay"></div>';
+  }
+}
+
+// 关于页面
+function loadAboutPage() {
+  var content = '<div class="about-page"><h2>🌸 关于我们</h2><p>YS工作室博客论坛是一个温暖的知识交流社区，致力于分享技术、交流想法、结识朋友。</p><p>我们提供多板块论坛、即时私信、积分等级等功能，让每个人都能在这里找到属于自己的天地。</p><h3 style="margin-top:16px;font-size:16px">💪 我们的技能</h3><div class="skills">';
+  var skills = ['JavaScript', 'Vue.js', 'React', 'Node.js', 'Python', 'Go', 'Docker', 'Kubernetes', 'AI/ML', 'UI/UX'];
+  skills.forEach(function(s) { content += '<span class="skill">' + s + '</span>'; });
+  content += '</div></div>';
+  return content;
+}
+
+// 追番功能
+function loadAnimeList() {
+  var anime = [
+    { title: '进击的巨人', status: '完结', image: '' },
+    { title: '鬼灭之刃', status: '连载中', image: '' },
+    { title: '咒术回战', status: '连载中', image: '' },
+    { title: '间谍过家家', status: '连载中', image: '' }
+  ];
+  var html = '<div class="anime-grid">';
+  anime.forEach(function(a) {
+    html += '<div class="anime-card"><img src="' + (a.image || '/img/default-avatar.png') + '"><div class="info"><div class="title">' + a.title + '</div><span class="status" style="background:' + (a.status === '完结' ? 'var(--success)' : 'var(--primary)') + ';color:#fff">' + a.status + '</span></div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// 日记功能
+function loadDiaryPage() {
+  api('GET', '/api/posts?sort=latest&limit=10', null, function(err, d) {
+    if (err || d.code !== 200) return;
+    var html = '';
+    d.data.posts.forEach(function(p) {
+      html += '<div class="diary-item"><div class="date">' + timeAgo(p.created_at) + '</div><div class="content">' + esc(p.content) + '</div><div class="mood">😊</div></div>';
+    });
+    console.log('Diary loaded');
+  });
+}
+
+
 </script>
 
 <!-- 樱花画布 -->
@@ -1271,6 +1407,10 @@ function checkOutdated(createdAt) {
 
 <!-- 音乐播放器 -->
 <div id="musicPlayer" class="music-player mini"></div>
+
+
+<!-- Live2D 看板娘 -->
+<div id="live2d-widget"></div>
 
 </body>
 </html>
