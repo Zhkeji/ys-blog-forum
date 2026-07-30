@@ -374,6 +374,53 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
 /* 日记 */
 .diary-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
 
+
+/* 音乐播放器 */
+.music-player{position:fixed;bottom:20px;right:20px;z-index:100;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.15);overflow:hidden;transition:all 0.3s}
+.music-player.mini{width:48px;height:48px;border-radius:50%;cursor:pointer}
+.music-player.expanded{width:320px}
+.music-header{display:flex;align-items:center;gap:10px;padding:12px;cursor:pointer}
+.music-header img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+.music-header .title{font-size:13px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.music-header .artist{font-size:11px;color:var(--text-light)}
+.music-controls{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 12px}
+.music-controls button{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text);padding:4px}
+.music-controls button:hover{color:var(--primary)}
+.music-progress{height:4px;background:var(--hover);cursor:pointer;margin:0 12px 8px;border-radius:2px}
+.music-progress .fill{height:100%;background:var(--primary);border-radius:2px;width:0%;transition:width 0.1s}
+.music-lyrics{max-height:150px;overflow-y:auto;padding:0 12px 12px;font-size:12px;color:var(--text-light);line-height:1.8}
+.music-lyrics .active{color:var(--primary);font-weight:600}
+
+/* 天气组件 */
+.weather-widget{background:linear-gradient(135deg,#74b9ff,#0984e1);border-radius:var(--radius);padding:16px;margin-bottom:12px;color:#fff}
+.weather-widget .city{font-size:14px;font-weight:600;margin-bottom:4px}
+.weather-widget .temp{font-size:32px;font-weight:700;margin-bottom:4px}
+.weather-widget .desc{font-size:13px;opacity:0.9}
+.weather-widget .icon{font-size:48px;float:right;margin-top:-10px}
+
+/* Live2D 看板娘 */
+#live2d-container{position:fixed;bottom:0;left:20px;z-index:99;pointer-events:none}
+#live2d-container canvas{pointer-events:auto}
+
+/* AI 摘要 */
+.ai-summary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:var(--radius);padding:16px;margin-bottom:16px;color:#fff}
+.ai-summary .title{font-size:14px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-summary .content{font-size:13px;line-height:1.6;opacity:0.9}
+
+/* 订阅页面 */
+.subscribe-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:16px}
+.subscribe-box h3{font-size:16px;margin-bottom:8px}
+.subscribe-box p{font-size:13px;color:var(--text-light);margin-bottom:12px}
+.subscribe-box input{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:8px}
+
+/* 文章过期提醒 */
+.outdated-notice{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;font-size:13px;color:#f59e0b}
+
+/* 动态筛选标签 */
+.filter-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filter-tag{padding:4px 12px;background:var(--hover);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:0.2s}
+.filter-tag:hover,.filter-tag.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
 </style>
 </head>
 <body>
@@ -566,6 +613,16 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
           <div class="stat-item"><div class="num" id="sPosts">0</div><div class="lbl">帖子</div></div>
           <div class="stat-item"><div class="num" id="sUsers">0</div><div class="lbl">用户</div></div>
         </div></div>
+      </div>
+
+      
+      <div class="sb-card">
+        <div class="sb-card-header"><i class="fa-solid fa-cloud-sun"></i> 天气</div>
+        <div class="sb-card-body">
+          <div class="weather-widget" id="weatherWidget">
+            <div class="city">加载中...</div>
+          </div>
+        </div>
       </div>
 
       <div class="sb-card">
@@ -871,7 +928,7 @@ function submitFriendLink(){
 function renderPag(pag){var c=$('pagination');if(!pag||pag.totalPages<=1){c.innerHTML='';return;}var h='';if(pag.page>1)h+='<button onclick="goPage('+(pag.page-1)+')">上一页</button>';for(var i=Math.max(1,pag.page-2);i<=Math.min(pag.totalPages,pag.page+2);i++){var active=i===pag.page;h+='<button class="'+(active?'active':'')+'" onclick="goPage('+i+')">'+i+'</button>';}if(pag.page<pag.totalPages)h+='<button onclick="goPage('+(pag.page+1)+')">下一页</button>';c.innerHTML=h;}
 function goPage(p){PAGE=p;loadPosts(true);window.scrollTo({top:0,behavior:'smooth'});}
 $('mainPage').style.display='block';
-loadCategories();loadBlogPosts(true);loadSidebar();loadAnnouncements();loadSiteFooter();setTimeout(typeWriter,1000);
+loadCategories();loadBlogPosts(true);loadSidebar();loadAnnouncements();loadSiteFooter();setTimeout(typeWriter,1000);initMusicPlayer();loadWeather();
 if(TOKEN){api('GET','/api/auth/me',null,function(err,d){if(err||d.code!==200||!d.data.user){localStorage.removeItem('token');TOKEN=null;} else { USER=d.data.user;enterSite();}});}
 
 // === 新增功能 ===
@@ -1106,6 +1163,71 @@ function toggleLayout() {
 }
 
 
+
+// 音乐播放器
+var musicPlayer = { playing: false, current: 0, tracks: [] };
+function initMusicPlayer() {
+  api('GET', '/api/music', null, function(err, d) {
+    if (err || d.code !== 200 || !d.data.music.length) return;
+    musicPlayer.tracks = d.data.music;
+    renderMusicPlayer();
+  });
+}
+
+function renderMusicPlayer() {
+  var player = document.getElementById('musicPlayer');
+  if (!player || !musicPlayer.tracks.length) return;
+  var track = musicPlayer.tracks[musicPlayer.current];
+  player.innerHTML = '<div class="music-header" onclick="toggleMusicExpand()"><img src="' + (track.cover || '/img/logo.png') + '"><div><div class="title">' + esc(track.title) + '</div><div class="artist">' + esc(track.artist || '未知') + '</div></div></div><div class="music-controls"><button onclick="prevTrack()"><i class="fa-solid fa-backward-step"></i></button><button onclick="togglePlay()"><i class="fa-solid ' + (musicPlayer.playing ? 'fa-pause' : 'fa-play') + '"></i></button><button onclick="nextTrack()"><i class="fa-solid fa-forward-step"></i></button></div><div class="music-progress"><div class="fill" id="musicProgress"></div></div>';
+}
+
+function togglePlay() { musicPlayer.playing = !musicPlayer.playing; renderMusicPlayer(); }
+function prevTrack() { musicPlayer.current = (musicPlayer.current - 1 + musicPlayer.tracks.length) % musicPlayer.tracks.length; renderMusicPlayer(); }
+function nextTrack() { musicPlayer.current = (musicPlayer.current + 1) % musicPlayer.tracks.length; renderMusicPlayer(); }
+function toggleMusicExpand() { var p = document.getElementById('musicPlayer'); p.classList.toggle('expanded'); p.classList.toggle('mini'); }
+
+// 天气组件
+function loadWeather() {
+  // Use a free weather API
+  fetch('https://wttr.in/?format=j1')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.current_condition || !d.current_condition[0]) return;
+      var w = d.current_condition[0];
+      var area = document.getElementById('weatherWidget');
+      if (area) {
+        area.innerHTML = '<div class="icon">🌤️</div><div class="city">' + (d.nearest_area && d.nearest_area[0] ? d.nearest_area[0].areaName[0].value : '未知') + '</div><div class="temp">' + w.temp_C + '°C</div><div class="desc">' + w.weatherDesc[0].value + '</div>';
+      }
+    })
+    .catch(function() {});
+}
+
+// AI 摘要（模拟）
+function generateAISummary(content) {
+  if (!content) return '';
+  var sentences = content.split(/[。！？.!?]/).filter(function(s) { return s.trim().length > 10; });
+  var summary = sentences.slice(0, 3).join('。') + '...';
+  return '<div class="ai-summary"><div class="title"><i class="fa-solid fa-robot"></i> AI 摘要</div><div class="content">' + esc(summary) + '</div></div>';
+}
+
+// 订阅功能
+function subscribe() {
+  var email = document.getElementById('subscribeEmail');
+  if (!email || !email.value.trim()) { toast('请输入邮箱'); return; }
+  toast('订阅功能开发中', false);
+}
+
+// 文章过期检查
+function checkOutdated(createdAt) {
+  if (!createdAt) return '';
+  var daysSince = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+  if (daysSince > 180) {
+    return '<div class="outdated-notice"><i class="fa-solid fa-exclamation-triangle"></i> 这篇文章发布于 ' + Math.floor(daysSince) + ' 天前，内容可能已过时</div>';
+  }
+  return '';
+}
+
+
 </script>
 
 <!-- 樱花画布 -->
@@ -1145,6 +1267,10 @@ function toggleLayout() {
     <div class="modal-body" id="skillsContent"></div>
   </div>
 </div>
+
+
+<!-- 音乐播放器 -->
+<div id="musicPlayer" class="music-player mini"></div>
 
 </body>
 </html>
