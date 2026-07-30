@@ -453,4 +453,56 @@ r.get('/logs/operation', requireSuperAdmin, (req, res) => {
   } catch (e) { res.json({ code: 500, message: '失败' }); }
 });
 
+
+// 页面管理
+r.get('/pages', requirePermission('settings'), (req, res) => {
+  try {
+    const pages = db.prepare('SELECT * FROM pages ORDER BY slug').all();
+    res.json({ code: 200, data: { pages } });
+  } catch (e) { res.json({ code: 500, message: '获取失败' }); }
+});
+
+r.get('/pages/:slug', (req, res) => {
+  try {
+    const page = db.prepare('SELECT * FROM pages WHERE slug=?').get(req.params.slug);
+    if (!page) return res.json({ code: 404, message: '页面不存在' });
+    res.json({ code: 200, data: { page } });
+  } catch (e) { res.json({ code: 500, message: '获取失败' }); }
+});
+
+r.post('/pages', requireSuperAdmin, (req, res) => {
+  try {
+    const { slug, title, content, metaDescription } = req.body;
+    if (!slug || !title) return res.json({ code: 400, message: '请填写页面标识和标题' });
+    const existing = db.prepare('SELECT id FROM pages WHERE slug=?').get(slug);
+    if (existing) return res.json({ code: 400, message: '页面标识已存在' });
+    const id = uuidv4();
+    db.prepare('INSERT INTO pages (id,slug,title,content,meta_description) VALUES (?,?,?,?,?)').run(id, slug, title, content || '', metaDescription || '');
+    res.json({ code: 200, message: '页面已创建', data: { id } });
+  } catch (e) { res.json({ code: 500, message: '创建失败' }); }
+});
+
+r.put('/pages/:id', requireSuperAdmin, (req, res) => {
+  try {
+    const { title, content, metaDescription, isPublished } = req.body;
+    const f = [], v = [];
+    if (title !== undefined) { f.push('title=?'); v.push(title); }
+    if (content !== undefined) { f.push('content=?'); v.push(content); }
+    if (metaDescription !== undefined) { f.push('meta_description=?'); v.push(metaDescription); }
+    if (isPublished !== undefined) { f.push('is_published=?'); v.push(isPublished ? 1 : 0); }
+    f.push("updated_at=datetime('now')");
+    v.push(req.params.id);
+    db.prepare(`UPDATE pages SET ${f.join(',')} WHERE id=?`).run(...v);
+    res.json({ code: 200, message: '页面已更新' });
+  } catch (e) { res.json({ code: 500, message: '更新失败' }); }
+});
+
+r.delete('/pages/:id', requireSuperAdmin, (req, res) => {
+  try {
+    db.prepare('DELETE FROM pages WHERE id=?').run(req.params.id);
+    res.json({ code: 200, message: '页面已删除' });
+  } catch (e) { res.json({ code: 500, message: '删除失败' }); }
+});
+
+
 module.exports = r;

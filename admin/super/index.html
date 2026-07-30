@@ -72,6 +72,7 @@ textarea.form-input{min-height:80px;resize:vertical;font-family:inherit}
       <div class="nav-item" data-page="verifications"><i class="fa-solid fa-certificate"></i>身份认证</div>
       <div class="nav-label">系统</div>
       <div class="nav-item" data-page="settings"><i class="fa-solid fa-gear"></i>网站设置</div>
+      <div class="nav-item" data-page="pages"><i class="fa-solid fa-file-lines"></i>页面管理</div>
       <div class="nav-item" data-page="sensitive"><i class="fa-solid fa-shield-halved"></i>敏感词</div>
       <div class="nav-item" data-page="music"><i class="fa-solid fa-music"></i>音乐管理</div>
       <div class="nav-item" data-page="links"><i class="fa-solid fa-link"></i>友链管理</div>
@@ -117,6 +118,16 @@ textarea.form-input{min-height:80px;resize:vertical;font-family:inherit}
       <div class="page" id="page-admins"><div style="display:flex;justify-content:space-between;margin-bottom:20px"><h2 style="font-size:20px">🛡️ 管理员管理</h2><button class="btn btn-primary" onclick="showAddAdmin()"><i class="fa-solid fa-plus"></i> 添加管理员</button></div><div class="card"><div id="adminsTable"></div></div></div>
       <!-- 身份认证 -->
       <div class="page" id="page-verifications"><h2 style="font-size:20px;margin-bottom:20px">🛡️ 身份认证管理</h2><div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn btn-primary" onclick="loadVerifications('pending')">待审核</button><button class="btn btn-ghost" onclick="loadVerifications('approved')">已通过</button><button class="btn btn-ghost" onclick="loadVerifications('rejected')">已驳回</button></div><div class="card"><div id="verTable"></div></div></div>
+      
+      <!-- 页面管理 -->
+      <div class="page" id="page-pages">
+        <div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <h2 style="font-size:20px">📄 页面管理</h2>
+          <button class="btn btn-primary" onclick="showAddPage()"><i class="fa-solid fa-plus"></i> 新建页面</button>
+        </div>
+        <div class="card"><div id="pagesTable"></div></div>
+      </div>
+
       <!-- 网站设置 -->
       <div class="page" id="page-settings"><h2 style="font-size:20px;margin-bottom:20px">⚙️ 网站设置</h2><div class="card" style="max-width:600px">
         <div class="form-group"><label class="form-label">网站LOGO</label><div style="display:flex;gap:12px;align-items:center"><img id="logoPreview" src="/img/logo.png" style="width:48px;height:48px;border-radius:12px;object-fit:cover;cursor:pointer" onclick="document.getElementById('logoInput').click()"><div><input type="file" id="logoInput" accept="image/*" style="display:none" onchange="uploadLogo(this)"><input id="setLogo" class="form-input" placeholder="LOGO路径"><button class="btn btn-sm btn-ghost" onclick="document.getElementById('logoInput').click()" style="margin-top:4px">上传图片</button></div></div></div>
@@ -153,6 +164,20 @@ textarea.form-input{min-height:80px;resize:vertical;font-family:inherit}
 <div class="modal-bg" id="addCatModal" onclick="this.classList.remove('show')"><div class="modal-box" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:16px">新增板块</h3><div class="form-group"><label class="form-label">名称</label><input id="catName" class="form-input"></div><div class="form-group"><label class="form-label">描述</label><input id="catDesc" class="form-input"></div><div class="form-group"><label class="form-label">图标</label><input id="catIcon" class="form-input" value="📝"></div><div class="form-group"><label class="form-label">颜色</label><input id="catColor" class="form-input" type="color" value="#6366f1"></div><button class="btn btn-primary" onclick="addCat()" style="width:100%">创建</button></div></div>
 <div class="modal-bg" id="addAdminModal" onclick="this.classList.remove('show')"><div class="modal-box" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:16px">添加管理员</h3><div class="form-group"><label class="form-label">用户名</label><input id="newAdminUser" class="form-input"></div><div class="form-group"><label class="form-label">密码</label><input id="newAdminPass" type="password" class="form-input"></div><div class="form-group"><label class="form-label">昵称</label><input id="newAdminNick" class="form-input"></div><button class="btn btn-primary" onclick="addAdmin()" style="width:100%">创建</button></div></div>
 <div class="modal-bg" id="permModal" onclick="this.classList.remove('show')"><div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px"><h3 style="font-size:18px;margin-bottom:6px">🛡️ 管理员权限设置</h3><p id="permAdminName" style="font-size:13px;color:#8e8e93;margin-bottom:20px"></p><div id="permCheckboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px"></div><button class="btn btn-primary" onclick="savePermissions()" style="width:100%">保存权限</button></div></div>
+
+<!-- 页面编辑器弹窗 -->
+<div class="modal-bg" id="pageEditorModal" onclick="this.classList.remove('show')">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:700px">
+    <h3 style="font-size:18px;margin-bottom:16px" id="pageEditorTitle">新建页面</h3>
+    <div class="form-group"><label class="form-label">页面标识（URL路径）</label><input id="pageSlug" class="form-input" placeholder="about"></div>
+    <div class="form-group"><label class="form-label">页面标题</label><input id="pageTitle" class="form-input" placeholder="关于我们"></div>
+    <div class="form-group"><label class="form-label">页面内容</label><textarea id="pageContent" class="form-input" rows="10" placeholder="页面内容..."></textarea></div>
+    <div class="form-group"><label class="form-label">SEO描述</label><textarea id="pageMeta" class="form-input" rows="2" placeholder="搜索引擎描述"></textarea></div>
+    <input type="hidden" id="pageEditId">
+    <button class="btn btn-primary" onclick="savePage()" style="width:100%">保存页面</button>
+  </div>
+</div>
+
 <div class="toast-area" id="toastArea"></div>
 <script>
 var API='',TOKEN=localStorage.getItem('admin_token')||null,adminUser=null;
@@ -163,7 +188,7 @@ document.querySelectorAll('.nav-item[data-page]').forEach(function(n){n.addEvent
 function doLogin(){var u=document.getElementById('adminUser').value,p=document.getElementById('adminPass').value;if(!u||!p)return showT('请输入账号密码','error');api('POST','/api/auth/login',{username:u,password:p},function(err,d){if(err){showT(err,'error');return;}if(d.code!==200){showT(d.message,'error');return;}if(d.data.user.role!=='super_admin'){showT('仅限超级管理员','error');return;}TOKEN=d.data.token;localStorage.setItem('admin_token',TOKEN);adminUser=d.data.user;showApp();});}
 function showApp(){document.getElementById('loginPage').style.display='none';document.getElementById('adminApp').style.display='block';document.getElementById('adminName').textContent=adminUser.nickname;loadPage('dashboard');}
 function logout(){TOKEN=null;localStorage.removeItem('admin_token');location.reload();}
-function loadPage(p){var fn={dashboard:loadDashboard,posts:loadPosts,comments:loadComments,reports:loadReports,announcements:loadAnn,categories:loadCats,users:loadUsers,admins:loadAdmins,verifications:function(){loadVerifications('pending')},settings:loadSettings,sensitive:loadSensitive,music:loadMusic,links:loadLinks,feedback:loadFeedback,maintenance:loadMaintenance,logs:function(){loadLogs('login')},"link-apps":function(){loadLinkApps('pending')}};if(fn[p])fn[p]();}
+function loadPage(p){var fn={dashboard:loadDashboard,posts:loadPosts,comments:loadComments,reports:loadReports,announcements:loadAnn,categories:loadCats,users:loadUsers,admins:loadAdmins,verifications:function(){loadVerifications('pending')},settings:loadSettings,sensitive:loadSensitive,music:loadMusic,links:loadLinks,feedback:loadFeedback,maintenance:loadMaintenance,logs:function(){loadLogs('login')},"link-apps":function(){loadLinkApps('pending')},pages:loadPages};if(fn[p])fn[p]();}
 
 function api(m,u,d,cb){var h={'Content-Type':'application/json'};if(TOKEN)h['Authorization']='Bearer '+TOKEN;var r=new XMLHttpRequest();r.open(m,u,true);for(var k in h)r.setRequestHeader(k,h[k]);r.onreadystatechange=function(){if(r.readyState===4)try{var j=JSON.parse(r.responseText);cb(null,j);}catch(e){cb('解析失败');}};r.onerror=function(){cb('网络错误');};r.send(d?JSON.stringify(d):null);}
 function esc(s){if(!s)return '';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -224,6 +249,68 @@ function loadVerifications(status){api('GET','/api/admin/verifications?status='+
 function reviewVer(id,status){var note=status==='rejected'?prompt('驳回理由（选填）'):'';api('PUT','/api/admin/verifications/'+id,{status:status,adminNote:note||''},function(err,d){if(err||d.code!==200){showT(d.message||'失败','error');return;}showT(status==='approved'?'已通过':'已驳回');loadVerifications(status==='approved'?'approved':'pending');});}
 
 // 网站设置
+
+// 页面管理
+function loadPages(){
+  api('GET','/api/admin/pages',null,function(err,d){
+    if(err||d.code!==200)return;
+    var html='';
+    if(d.data.pages.length){
+      html='<table class="data-table"><thead><tr><th>标识</th><th>标题</th><th>状态</th><th>更新时间</th><th>操作</th></tr></thead><tbody>';
+      d.data.pages.forEach(function(p){
+        html+=`<tr><td><code>${esc(p.slug)}</code></td><td>${esc(p.title)}</td><td><span class="badge ${p.is_published?'badge-green':'badge-gray'}">${p.is_published?'已发布':'草稿'}</span></td><td>${fmtDate(p.updated_at)}</td><td class="actions"><button class="btn btn-sm btn-ghost" onclick="editPage('${p.id}')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deletePage('${p.id}')">删除</button></td></tr>`;
+      });
+      html+='</tbody></table>';
+    }else{
+      html='<p style="color:#8e8e93;text-align:center;padding:20px">暂无自定义页面</p>';
+    }
+    document.getElementById('pagesTable').innerHTML=html;
+  });
+}
+
+function showAddPage(){
+  document.getElementById('pageEditorTitle').textContent='新建页面';
+  document.getElementById('pageSlug').value='';
+  document.getElementById('pageTitle').value='';
+  document.getElementById('pageContent').value='';
+  document.getElementById('pageMeta').value='';
+  document.getElementById('pageEditId').value='';
+  document.getElementById('pageSlug').disabled=false;
+  document.getElementById('pageEditorModal').classList.add('show');
+}
+
+function editPage(id){
+  api('GET','/api/admin/pages/'+id,null,function(err,d){
+    if(err||d.code!==200)return;
+    var p=d.data.page;
+    document.getElementById('pageEditorTitle').textContent='编辑页面';
+    document.getElementById('pageSlug').value=p.slug;
+    document.getElementById('pageSlug').disabled=true;
+    document.getElementById('pageTitle').value=p.title||'';
+    document.getElementById('pageContent').value=p.content||'';
+    document.getElementById('pageMeta').value=p.meta_description||'';
+    document.getElementById('pageEditId').value=id;
+    document.getElementById('pageEditorModal').classList.add('show');
+  });
+}
+
+function savePage(){
+  var slug=document.getElementById('pageSlug').value.trim();
+  var title=document.getElementById('pageTitle').value.trim();
+  var content=document.getElementById('pageContent').value;
+  var meta=document.getElementById('pageMeta').value.trim();
+  var editId=document.getElementById('pageEditId').value;
+  if(!slug||!title){showT('请填写标识和标题','error');return;}
+  var data={slug:slug,title:title,content:content,metaDescription:meta};
+  if(editId){
+    api('PUT','/api/admin/pages/'+editId,data,function(err,d){if(err||d.code!==200){showT(d&&d.message||'失败','error');return;}showT('已更新');document.getElementById('pageEditorModal').classList.remove('show');loadPages();});
+  }else{
+    api('POST','/api/admin/pages',data,function(err,d){if(err||d.code!==200){showT(d&&d.message||'失败','error');return;}showT('已创建');document.getElementById('pageEditorModal').classList.remove('show');loadPages();});
+  }
+}
+
+function deletePage(id){if(!confirm('确定删除？'))return;api('DELETE','/api/admin/pages/'+id,null,function(err,d){if(err||d.code!==200){showT('失败','error');return;}showT('已删除');loadPages();});}
+
 function loadSettings(){api('GET','/api/admin/settings',null,function(err,d){if(err||d.code!==200)return;var s=d.data.settings;document.getElementById('setLogo').value=s.siteLogo||'';document.getElementById('logoPreview').src=s.siteLogo||'/img/logo.png';document.getElementById('setSiteName').value=s.siteName||'';document.getElementById('setSiteDesc').value=s.siteDescription||'';document.getElementById('setFooter').value=s.siteFooter||'';document.getElementById('setAllowReg').checked=s.allowRegister==='true';document.getElementById('setPostReview').checked=s.postReview==='true';document.getElementById('setCheckinPts').value=s.checkinPoints||5;document.getElementById('setRegisterPts').value=s.registerPoints||10;document.getElementById('setPostPts').value=s.postPoints||2;document.getElementById('setCommentPts').value=s.commentPoints||1;});}
 function uploadLogo(input){if(!input.files||!input.files[0])return;var fd=new FormData();fd.append('image',input.files[0]);var r=new XMLHttpRequest();r.open('POST','/api/upload/image',true);if(TOKEN)r.setRequestHeader('Authorization','Bearer '+TOKEN);r.onreadystatechange=function(){if(r.readyState===4)try{var d=JSON.parse(r.responseText);if(d.code===200){document.getElementById('setLogo').value=d.data.url;document.getElementById('logoPreview').src=d.data.url;showT('LOGO已上传');}else showT(d.message||'失败','error');}catch(e){showT('失败','error');}};r.send(fd);}
 function saveSettings(){api('PUT','/api/admin/settings',{siteLogo:document.getElementById('setLogo').value,siteName:document.getElementById('setSiteName').value,siteDescription:document.getElementById('setSiteDesc').value,siteFooter:document.getElementById('setFooter').value,allowRegister:String(document.getElementById('setAllowReg').checked),postReview:String(document.getElementById('setPostReview').checked),checkinPoints:document.getElementById('setCheckinPts').value,registerPoints:document.getElementById('setRegisterPts').value,postPoints:document.getElementById('setPostPts').value,commentPoints:document.getElementById('setCommentPts').value},function(err,d){if(err||d.code!==200){showT(d.message||'失败','error');return;}showT('已保存');});}

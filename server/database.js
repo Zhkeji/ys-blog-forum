@@ -140,6 +140,18 @@ function initDatabase() {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
+    
+    CREATE TABLE IF NOT EXISTS pages (
+      id TEXT PRIMARY KEY,
+      slug TEXT UNIQUE NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT,
+      meta_description TEXT,
+      is_published INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS feedback (
       id TEXT PRIMARY KEY, user_id TEXT, content TEXT NOT NULL,
       contact TEXT, contact_type TEXT DEFAULT 'other',
