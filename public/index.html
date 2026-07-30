@@ -527,6 +527,20 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
     </div>
 
     <div class="sidebar">
+      
+      <div class="sb-card">
+        <div class="sb-card-header"><i class="fa-solid fa-compass"></i> 发现</div>
+        <div class="sb-card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button onclick="openModal('timelineModal')" style="flex:1;padding:8px;background:var(--hover);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;color:var(--text)">📅 时间线</button>
+            <button onclick="openModal('galleryModal')" style="flex:1;padding:8px;background:var(--hover);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;color:var(--text)">📷 相册</button>
+            <button onclick="openModal('projectsModal')" style="flex:1;padding:8px;background:var(--hover);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;color:var(--text)">🚀 项目</button>
+            <button onclick="openModal('skillsModal')" style="flex:1;padding:8px;background:var(--hover);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;color:var(--text)">💪 技能</button>
+            <button onclick="toggleLayout()" style="flex:1;padding:8px;background:var(--hover);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;color:var(--text)">📐 切换布局</button>
+          </div>
+        </div>
+      </div>
+
       <div class="sb-card" id="userCard" style="display:none">
         <div class="sb-card-body user-card">
           <img id="sbAvatar" src="/img/default-avatar.png">
@@ -1001,12 +1015,136 @@ function submitLoveWall() {
 }
 
 
+
+// 时间线功能
+function loadTimeline() {
+  api('GET', '/api/posts?sort=latest&limit=20', null, function(err, d) {
+    if (err || d.code !== 200) return;
+    var html = '<div class="timeline">';
+    d.data.posts.forEach(function(p) {
+      html += '<div class="timeline-item"><div class="time">' + timeAgo(p.created_at) + '</div><div class="content"><strong>' + esc(p.title) + '</strong><br>' + esc(p.summary || p.content.substring(0, 100)) + '...</div></div>';
+    });
+    html += '</div>';
+    // You can display this in a modal or page
+    console.log('Timeline loaded');
+  });
+}
+
+// 相册功能
+function loadGallery() {
+  api('GET', '/api/posts?sort=latest&limit=20', null, function(err, d) {
+    if (err || d.code !== 200) return;
+    var photos = d.data.posts.filter(function(p) { return p.cover_image; });
+    var html = '<div class="photo-grid">';
+    photos.forEach(function(p) {
+      html += '<div class="photo-item"><img src="' + p.cover_image + '" alt="' + esc(p.title) + '"><div class="caption">' + esc(p.title) + '</div></div>';
+    });
+    html += '</div>';
+    console.log('Gallery loaded');
+  });
+}
+
+// 项目展示
+function loadProjects() {
+  api('GET', '/api/posts?category=&sort=latest&limit=10', null, function(err, d) {
+    if (err || d.code !== 200) return;
+    var html = '<div class="project-grid">';
+    d.data.posts.forEach(function(p) {
+      html += '<div class="project-card"><div class="name">' + esc(p.title) + '</div><div class="desc">' + esc(p.summary || p.content.substring(0, 100)) + '</div></div>';
+    });
+    html += '</div>';
+    console.log('Projects loaded');
+  });
+}
+
+// 技能展示
+function loadSkills() {
+  var skills = [
+    { name: 'JavaScript', level: 90, color: '#f7df1e' },
+    { name: 'Vue.js', level: 85, color: '#4fc08d' },
+    { name: 'Node.js', level: 80, color: '#339933' },
+    { name: 'Python', level: 75, color: '#3776ab' },
+    { name: 'SQL', level: 70, color: '#4479a1' }
+  ];
+  var html = '';
+  skills.forEach(function(s) {
+    html += '<div class="skill-bar"><div class="label"><span>' + s.name + '</span><span>' + s.level + '%</span></div><div class="bar"><div class="fill" style="width:' + s.level + '%;background:' + s.color + '"></div></div></div>';
+  });
+  return html;
+}
+
+// 日记功能
+function loadDiary() {
+  api('GET', '/api/posts?sort=latest&limit=10', null, function(err, d) {
+    if (err || d.code !== 200) return;
+    var html = '';
+    d.data.posts.forEach(function(p) {
+      html += '<div class="diary-item"><div class="date">' + timeAgo(p.created_at) + '</div><div class="content">' + esc(p.content) + '</div></div>';
+    });
+    console.log('Diary loaded');
+  });
+}
+
+// 动态筛选
+function filterByTag(tag) {
+  SEARCH = tag;
+  loadPosts(true);
+}
+
+// 瀑布流布局切换
+var isWaterfall = false;
+function toggleLayout() {
+  isWaterfall = !isWaterfall;
+  var area = document.getElementById('postsArea');
+  if (isWaterfall) {
+    area.style.display = 'grid';
+    area.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+    area.style.gap = '16px';
+  } else {
+    area.style.display = 'block';
+  }
+}
+
+
 </script>
 
 <!-- 樱花画布 -->
 <canvas id="sakura-canvas"></canvas>
 <!-- 阅读进度条 -->
 <div id="readingProgress" style="position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));z-index:9999;width:0%"></div>
+
+
+<!-- 时间线弹窗 -->
+<div class="modal-overlay" id="timelineModal" onclick="closeModal('timelineModal')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:700px">
+    <div class="modal-header"><h3 style="font-size:16px;font-weight:600">📅 时间线</h3><button style="width:28px;height:28px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:16px;color:var(--text-light)" onclick="closeModal('timelineModal')">&times;</button></div>
+    <div class="modal-body" id="timelineContent"></div>
+  </div>
+</div>
+
+<!-- 相册弹窗 -->
+<div class="modal-overlay" id="galleryModal" onclick="closeModal('galleryModal')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:800px">
+    <div class="modal-header"><h3 style="font-size:16px;font-weight:600">📷 相册</h3><button style="width:28px;height:28px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:16px;color:var(--text-light)" onclick="closeModal('galleryModal')">&times;</button></div>
+    <div class="modal-body" id="galleryContent"></div>
+  </div>
+</div>
+
+<!-- 项目展示弹窗 -->
+<div class="modal-overlay" id="projectsModal" onclick="closeModal('projectsModal')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:800px">
+    <div class="modal-header"><h3 style="font-size:16px;font-weight:600">🚀 项目展示</h3><button style="width:28px;height:28px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:16px;color:var(--text-light)" onclick="closeModal('projectsModal')">&times;</button></div>
+    <div class="modal-body" id="projectsContent"></div>
+  </div>
+</div>
+
+<!-- 技能展示弹窗 -->
+<div class="modal-overlay" id="skillsModal" onclick="closeModal('skillsModal')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+    <div class="modal-header"><h3 style="font-size:16px;font-weight:600">💪 技能展示</h3><button style="width:28px;height:28px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:16px;color:var(--text-light)" onclick="closeModal('skillsModal')">&times;</button></div>
+    <div class="modal-body" id="skillsContent"></div>
+  </div>
+</div>
 
 </body>
 </html>
