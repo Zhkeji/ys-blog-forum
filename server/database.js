@@ -131,6 +131,15 @@ function initDatabase() {
       status TEXT DEFAULT 'active', created_at TEXT DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS friend_link_applications (
+      id TEXT PRIMARY KEY, user_id TEXT NOT NULL,
+      name TEXT NOT NULL, url TEXT NOT NULL,
+      logo TEXT, description TEXT,
+      status TEXT DEFAULT 'pending',
+      admin_note TEXT, reviewed_by TEXT, reviewed_at TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS feedback (
       id TEXT PRIMARY KEY, user_id TEXT, content TEXT NOT NULL,
       contact TEXT, contact_type TEXT DEFAULT 'other',

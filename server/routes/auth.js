@@ -216,4 +216,29 @@ r.get('/search-users', authenticate, (req, res) => {
   } catch (e) { res.json({ code: 500, message: '搜索失败' }); }
 });
 
+// 用户提交友链
+r.post('/friend-links/apply', authenticate, (req, res) => {
+  try {
+    const { name, url, logo, description } = req.body;
+    if (!name || !url) return res.json({ code: 400, message: '请填写网站名称和地址' });
+    if (!url.startsWith('http://') && !url.startsWith('https://')) return res.json({ code: 400, message: '请输入有效的网址' });
+    const db = getDb();
+    // 检查是否已提交过
+    const existing = db.prepare("SELECT id FROM friend_link_applications WHERE user_id=? AND status='pending'").get(req.user.id);
+    if (existing) return res.json({ code: 400, message: '你已有待审核的申请' });
+    const id = uuidv4();
+    db.prepare('INSERT INTO friend_link_applications (id,user_id,name,url,logo,description) VALUES (?,?,?,?,?,?)').run(id, req.user.id, name, url, logo || '', description || '');
+    res.json({ code: 200, message: '友链申请已提交，等待审核' });
+  } catch (e) { res.status(500).json({ code: 500, message: '提交失败' }); }
+});
+
+// 获取我的友链申请状态
+r.get('/friend-links/my', authenticate, (req, res) => {
+  try {
+    const db = getDb();
+    const applications = db.prepare('SELECT * FROM friend_link_applications WHERE user_id=? ORDER BY created_at DESC').all(req.user.id);
+    res.json({ code: 200, data: { applications } });
+  } catch (e) { res.status(500).json({ code: 500, message: '获取失败' }); }
+});
+
 module.exports = r;

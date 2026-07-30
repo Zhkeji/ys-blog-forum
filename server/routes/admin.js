@@ -240,6 +240,29 @@ r.delete('/friend-links/:id', requireSuperAdmin, (req, res) => {
   try { db.prepare('DELETE FROM friend_links WHERE id=?').run(req.params.id); res.json({ code: 200, message: '已删除' }); } catch (e) { res.json({ code: 500, message: '失败' }); }
 });
 
+// 友链申请管理
+r.get('/friend-link-applications', requirePermission('links'), (req, res) => {
+  try {
+    const status = req.query.status || 'pending';
+    const apps = db.prepare(`SELECT a.*,u.username,u.nickname FROM friend_link_applications a LEFT JOIN users u ON a.user_id=u.id WHERE a.status=? ORDER BY a.created_at DESC`).all(status);
+    res.json({ code: 200, data: { applications: apps } });
+  } catch (e) { res.json({ code: 500, message: '失败' }); }
+});
+
+r.put('/friend-link-applications/:id', requirePermission('links'), (req, res) => {
+  try {
+    const { status, adminNote } = req.body;
+    if (!['approved', 'rejected'].includes(status)) return res.json({ code: 400, message: '无效状态' });
+    const app = db.prepare('SELECT * FROM friend_link_applications WHERE id=?').get(req.params.id);
+    if (!app) return res.json({ code: 404, message: '申请不存在' });
+    db.prepare("UPDATE friend_link_applications SET status=?,admin_note=?,reviewed_by=?,reviewed_at=datetime('now') WHERE id=?").run(status, adminNote || '', req.user.id, req.params.id);
+    if (status === 'approved') {
+      db.prepare('INSERT INTO friend_links (id,name,url,logo,description) VALUES (?,?,?,?,?)').run(uuidv4(), app.name, app.url, app.logo || '', app.description || '');
+    }
+    res.json({ code: 200, message: status === 'approved' ? '已通过' : '已驳回' });
+  } catch (e) { res.json({ code: 500, message: '失败' }); }
+});
+
 // 反馈管理
 r.get('/feedback', requirePermission('feedback'), (req, res) => {
   try {

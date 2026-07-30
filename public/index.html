@@ -323,6 +323,9 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
       <div class="sb-card">
         <div class="sb-card-header"><i class="fa-solid fa-link"></i> 友情链接</div>
         <div class="sb-card-body" id="friendLinks"><p style="color:var(--text-light);font-size:12px">暂无</p></div>
+        <div style="padding:0 16px 12px">
+          <button onclick="openModal('friendLinkModal')" style="width:100%;padding:8px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer">🔗 申请友链</button>
+        </div>
       </div>
 
       <div class="sb-card">
@@ -335,6 +338,24 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
       </div>
 
       <div style="text-align:center;font-size:11px;color:var(--text-light);padding:8px" id="siteFooter">© 2026 YS工作室博客论坛系统</div>
+    </div>
+  </div>
+</div>
+
+<!-- 友链申请弹窗 -->
+<div class="modal-overlay" id="friendLinkModal" onclick="closeModal('friendLinkModal')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:480px">
+    <div class="modal-header"><h3 style="font-size:16px;font-weight:600">🔗 申请友情链接</h3><button style="width:28px;height:28px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:16px;color:var(--text-light)" onclick="closeModal('friendLinkModal')">&times;</button></div>
+    <div class="modal-body">
+      <div style="background:var(--hover);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text-light)">
+        <p>📝 提交友链申请，审核通过后将显示在友情链接区域</p>
+      </div>
+      <div class="form-group"><label>网站名称 *</label><input class="form-input" id="flName" placeholder="你的网站名称" maxlength="30"></div>
+      <div class="form-group"><label>网站地址 *</label><input class="form-input" id="flUrl" placeholder="https://example.com"></div>
+      <div class="form-group"><label>网站Logo</label><input class="form-input" id="flLogo" placeholder="Logo图片URL（选填）"></div>
+      <div class="form-group"><label>网站描述</label><textarea class="form-input" id="flDesc" rows="2" placeholder="一句话介绍你的网站（选填）"></textarea></div>
+      <button class="form-btn" onclick="submitFriendLink()">提交申请</button>
+      <div id="flStatus" style="margin-top:12px"></div>
     </div>
   </div>
 </div>
@@ -545,6 +566,19 @@ function loadAnnouncements(){api('GET','/api/announcements?limit=5',null,functio
 function loadSiteFooter(){api('GET','/api/admin/settings',null,function(err,d){if(!err&&d.code===200&&d.data.settings.siteFooter){$('siteFooter').textContent=d.data.settings.siteFooter;if(d.data.settings.siteName)$('siteName').textContent=d.data.settings.siteName;if(d.data.settings.siteLogo)$('siteLogo').src=d.data.settings.siteLogo;}});}
 function checkUnread(){api('GET','/api/chat/unread',null,function(err,d){if(!err&&d.code===200&&d.data.count>0){$('unreadBadge').style.display='inline';$('unreadBadge').textContent=d.data.count;}});}
 function submitFeedback(){var content=$('fbContent').value.trim(),contact=$('fbContact').value.trim();if(!content){toast('请输入反馈内容');return;}api('POST','/api/feedback',{content:content,contact:contact},function(err,d){if(err||d.code!==200){toast(d&&d.message||'失败');return;}toast('反馈已提交',true);$('fbContent').value='';$('fbContact').value='';});}
+
+function submitFriendLink(){
+  var name=$('flName').value.trim(),url=$('flUrl').value.trim(),logo=$('flLogo').value.trim(),desc=$('flDesc').value.trim();
+  if(!name){toast('请输入网站名称');return;}
+  if(!url){toast('请输入网站地址');return;}
+  if(!url.startsWith('http://')&&!url.startsWith('https://')){toast('请输入有效的网址');return;}
+  api('POST','/api/auth/friend-links/apply',{name:name,url:url,logo:logo,description:desc},function(err,d){
+    if(err||d.code!==200){toast(d&&d.message||'提交失败');return;}
+    toast('友链申请已提交',true);
+    $('flName').value='';$('flUrl').value='';$('flLogo').value='';$('flDesc').value='';
+    closeModal('friendLinkModal');
+  });
+}
 function renderPag(pag){var c=$('pagination');if(!pag||pag.totalPages<=1){c.innerHTML='';return;}var h='';if(pag.page>1)h+='<button onclick="goPage('+(pag.page-1)+')">上一页</button>';for(var i=Math.max(1,pag.page-2);i<=Math.min(pag.totalPages,pag.page+2);i++){var active=i===pag.page;h+='<button class="'+(active?'active':'')+'" onclick="goPage('+i+')">'+i+'</button>';}if(pag.page<pag.totalPages)h+='<button onclick="goPage('+(pag.page+1)+')">下一页</button>';c.innerHTML=h;}
 function goPage(p){PAGE=p;loadPosts(true);window.scrollTo({top:0,behavior:'smooth'});}
 $('mainPage').style.display='block';
