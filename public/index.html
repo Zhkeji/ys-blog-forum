@@ -454,6 +454,34 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
 .diary-item .content{font-size:14px;line-height:1.6;color:var(--text)}
 .diary-item .mood{font-size:20px;margin-top:8px}
 
+
+/* 评论表情选择器 */
+.emoji-picker{position:absolute;bottom:100%;left:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow);z-index:10;display:none;width:280px}
+.emoji-picker.show{display:block}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.emoji-item{font-size:20px;padding:4px;text-align:center;cursor:pointer;border-radius:4px;transition:0.15s}
+.emoji-item:hover{background:var(--hover)}
+
+/* 文章版权信息 */
+.post-copyright{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:20px 0;position:relative;overflow:hidden}
+.post-copyright::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.post-copyright .title{font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.post-copyright .info{font-size:12px;color:var(--text-light);line-height:1.8}
+.post-copyright .info a{color:var(--primary)}
+
+/* 评论图片上传 */
+.comment-upload{display:flex;align-items:center;gap:8px;margin-top:8px}
+.comment-upload label{cursor:pointer;padding:6px 12px;background:var(--hover);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-light)}
+.comment-upload label:hover{border-color:var(--primary);color:var(--primary)}
+
+/* 评论回复高亮 */
+.cmt.replying{background:var(--hover);border-radius:8px;padding:12px}
+
+/* 文章分享按钮 */
+.share-buttons{display:flex;gap:8px;margin-top:12px}
+.share-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;background:var(--card);color:var(--text-light);transition:0.2s}
+.share-btn:hover{border-color:var(--primary);color:var(--primary)}
+
 </style>
 </head>
 <body>
@@ -1361,6 +1389,103 @@ function loadDiaryPage() {
     });
     console.log('Diary loaded');
   });
+}
+
+
+
+// 评论表情
+var emojis = ['😀','😂','😍','🥰','😎','🤔','😅','😢','😡','🥳','🤩','😭','😱','🤩','😴','🤮','👻','💀','🤡','👽','🤖','💩','👍','👎','❤️','💔','💯','🔥','✨','🎉','🎊','💪','🙏','👀','👅','👄','💋','🫶','🤝','🫡','🫢','🫣','🫠'];
+var currentCommentInput = null;
+
+function showEmojiPicker(inputId) {
+  currentCommentInput = document.getElementById(inputId);
+  var picker = document.getElementById('emojiPicker');
+  if (!picker) {
+    picker = document.createElement('div');
+    picker.id = 'emojiPicker';
+    picker.className = 'emoji-picker';
+    document.body.appendChild(picker);
+  }
+  
+  var html = '<div class="emoji-grid">';
+  emojis.forEach(function(e) {
+    html += '<span class="emoji-item" onclick="insertEmoji(\'' + e + '\')">' + e + '</span>';
+  });
+  html += '</div>';
+  picker.innerHTML = html;
+  
+  // Position near the input
+  var rect = currentCommentInput.getBoundingClientRect();
+  picker.style.position = 'fixed';
+  picker.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
+  picker.style.left = rect.left + 'px';
+  picker.classList.add('show');
+}
+
+function insertEmoji(emoji) {
+  if (currentCommentInput) {
+    currentCommentInput.value += emoji;
+    currentCommentInput.focus();
+  }
+  var picker = document.getElementById('emojiPicker');
+  if (picker) picker.classList.remove('show');
+}
+
+// 文章版权信息
+function generateCopyright(post) {
+  return '<div class="post-copyright"><div class="title">📋 版权信息</div><div class="info">' +
+    '<p>📝 作者：' + esc(post.author_name || '匿名') + '</p>' +
+    '<p>📅 发布时间：' + (post.created_at ? new Date(post.created_at).toLocaleString('zh-CN') : '未知') + '</p>' +
+    '<p>🔗 链接：' + window.location.href + '</p>' +
+    '<p>⚠️ 转载请注明出处</p>' +
+    '</div></div>';
+}
+
+// 文章分享
+function sharePost(platform, url, title) {
+  var shareUrl = '';
+  switch (platform) {
+    case 'weibo':
+      shareUrl = 'https://service.weibo.com/share/share.php?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
+      break;
+    case 'qq':
+      shareUrl = 'https://connect.qq.com/widget/shareqq/index.html?url=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(title);
+      break;
+    case 'wechat':
+      // Copy to clipboard
+      navigator.clipboard.writeText(url).then(function() { toast('链接已复制', true); });
+      return;
+    case 'twitter':
+      shareUrl = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title);
+      break;
+  }
+  if (shareUrl) window.open(shareUrl, '_blank', 'width=600,height=400');
+}
+
+// 评论图片上传
+function uploadCommentImage(input, commentInputId) {
+  if (!input.files || !input.files[0]) return;
+  var fd = new FormData();
+  fd.append('image', input.files[0]);
+  var r = new XMLHttpRequest();
+  r.open('POST', '/api/upload/image', true);
+  if (TOKEN) r.setRequestHeader('Authorization', 'Bearer ' + TOKEN);
+  r.onload = function() {
+    try {
+      var d = JSON.parse(r.responseText);
+      if (d.code === 200) {
+        var commentInput = document.getElementById(commentInputId);
+        if (commentInput) {
+          commentInput.value += ' ![图片](' + d.data.url + ')';
+          commentInput.focus();
+        }
+        toast('图片已上传', true);
+      } else {
+        toast(d.message || '上传失败');
+      }
+    } catch (e) { toast('上传失败'); }
+  };
+  r.send(fd);
 }
 
 
