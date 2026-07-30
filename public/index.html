@@ -177,6 +177,203 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
   .auth-brand .features{display:none}
   .auth-forms{padding:32px 24px}
 }
+
+/* === 新增功能样式 === */
+
+/* 樱花特效容器 */
+#sakura-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998}
+
+/* 首页打字机效果 */
+.home-header{position:relative;height:calc(100vh - 56px);width:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);overflow:hidden}
+.home-header .site-info{text-align:center;z-index:2}
+.home-header .site-info h1{font-size:2.6rem;color:#fff;font-weight:800;text-shadow:2px 2px 4px rgba(0,0,0,0.3)}
+.home-header .site-subtitle{font-size:1.7rem;color:rgba(255,255,255,0.9);min-height:1.5em}
+.home-header .cursor{display:inline-block;margin-left:4px;animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.home-header .scroll-indicator{position:absolute;bottom:20px;width:100%;text-align:center;animation:bounce 1.5s infinite;cursor:pointer}
+.home-header .scroll-indicator i{color:rgba(255,255,255,0.7);font-size:24px}
+@keyframes bounce{0%{opacity:0.4;transform:translateY(0)}50%{opacity:1;transform:translateY(-12px)}100%{opacity:0.4;transform:translateY(0)}}
+
+/* Banner波浪动画 */
+.waves{position:absolute;bottom:0;left:0;width:100%;height:80px;overflow:hidden;z-index:3}
+.waves svg{display:block;width:100%;height:100%}
+.waves .parallax use{animation:wave 25s cubic-bezier(.55,.5,.45,.5) infinite}
+@keyframes wave{0%{transform:translateX(-90px)}100%{transform:translateX(85px)}}
+
+/* 搜索弹窗 */
+.search-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:300;display:none;align-items:flex-start;justify-content:center;padding-top:15vh}
+.search-modal.show{display:flex}
+.search-box{background:var(--card);border-radius:16px;width:90%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden}
+.search-header{display:flex;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.search-header input{flex:1;border:none;outline:none;font-size:16px;background:transparent;color:var(--text);padding:0 12px}
+.search-header .close{width:32px;height:32px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:18px;color:var(--text-light)}
+.search-results{max-height:400px;overflow-y:auto;padding:8px}
+.search-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:0.15s}
+.search-item:hover{background:var(--hover)}
+.search-item .title{font-size:14px;font-weight:500;color:var(--text)}
+.search-item .meta{font-size:12px;color:var(--text-light)}
+.search-empty{text-align:center;padding:40px;color:var(--text-light)}
+
+/* 文章目录TOC */
+.toc-container{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow-y:auto;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+.toc-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:6px}
+.toc-list{list-style:none;padding:0;margin:0}
+.toc-item{margin:0}
+.toc-item a{display:block;padding:6px 12px;font-size:13px;color:var(--text-light);text-decoration:none;border-left:2px solid transparent;transition:0.2s;border-radius:0 4px 4px 0}
+.toc-item a:hover{color:var(--primary);background:var(--hover)}
+.toc-item a.active{color:var(--primary);border-left-color:var(--primary);background:var(--hover)}
+.toc-item.level-2 a{padding-left:24px}
+.toc-item.level-3 a{padding-left:36px}
+
+/* 文章版权信息 */
+.post-copyright{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:20px 0;position:relative;overflow:hidden}
+.post-copyright::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+.post-copyright .title{font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.post-copyright .info{font-size:12px;color:var(--text-light);line-height:1.8}
+.post-copyright .info a{color:var(--primary)}
+
+/* 阅读进度条 */
+.reading-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));z-index:9999;transition:width 0.1s}
+
+/* 动态说说 */
+.moment-widget{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.moment-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.moment-header img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.moment-content{font-size:14px;line-height:1.6;color:var(--text)}
+.moment-time{font-size:12px;color:var(--text-light);margin-top:8px}
+
+/* 树洞/匿名留言 */
+.tree-hole{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:var(--radius);padding:24px;margin-bottom:16px;text-align:center}
+.tree-hole h3{color:#fff;font-size:18px;margin-bottom:8px}
+.tree-hole p{color:rgba(255,255,255,0.8);font-size:13px;margin-bottom:16px}
+.tree-hole-input{display:flex;gap:8px;max-width:400px;margin:0 auto}
+.tree-hole-input input{flex:1;padding:10px 16px;border:none;border-radius:20px;font-size:14px;outline:none}
+.tree-hole-input button{padding:10px 20px;background:#fff;color:var(--primary);border:none;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer}
+
+/* 表白墙 */
+.love-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:16px}
+.love-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:0.2s}
+.love-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.love-card .sender{font-weight:600;color:var(--primary);margin-bottom:8px}
+.love-card .message{font-size:14px;line-height:1.6;color:var(--text)}
+.love-card .time{font-size:12px;color:var(--text-light);margin-top:8px}
+
+/* 时间线 */
+.timeline{position:relative;padding-left:30px}
+.timeline::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:24px}
+.timeline-item::before{content:'';position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid var(--card)}
+.timeline-item .time{font-size:12px;color:var(--text-light);margin-bottom:4px}
+.timeline-item .content{font-size:14px;color:var(--text);line-height:1.6}
+
+/* 相册网格 */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.photo-item{border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:0.2s}
+.photo-item:hover{transform:scale(1.02)}
+.photo-item img{width:100%;height:200px;object-fit:cover}
+.photo-item .caption{padding:8px 12px;font-size:13px;color:var(--text)}
+
+/* 追番网格 */
+.anime-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.anime-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:0.2s}
+.anime-card:hover{box-shadow:var(--shadow)}
+.anime-card img{width:100%;height:200px;object-fit:cover}
+.anime-card .info{padding:10px}
+.anime-card .title{font-size:13px;font-weight:600;margin-bottom:4px}
+.anime-card .status{font-size:11px;padding:2px 6px;border-radius:4px}
+
+/* 项目卡片 */
+.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:16px}
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:0.2s}
+.project-card:hover{box-shadow:var(--shadow)}
+.project-card .name{font-size:16px;font-weight:600;margin-bottom:8px}
+.project-card .desc{font-size:13px;color:var(--text-light);margin-bottom:12px}
+.project-card .tech{display:flex;flex-wrap:wrap;gap:4px}
+.project-card .tech span{font-size:11px;padding:2px 8px;background:var(--hover);border-radius:4px}
+
+/* 技能条 */
+.skill-bar{margin-bottom:12px}
+.skill-bar .label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.skill-bar .bar{height:8px;background:var(--hover);border-radius:4px;overflow:hidden}
+.skill-bar .fill{height:100%;border-radius:4px;transition:width 1s ease}
+
+/* 日记 */
+.diary-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.diary-item .date{font-size:12px;color:var(--text-light);margin-bottom:8px}
+.diary-item .content{font-size:14px;line-height:1.6;color:var(--text)}
+.diary-item .mood{font-size:20px;margin-top:8px}
+
+/* 樱花画布 */
+#sakura-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998}
+
+/* 阅读进度条 */
+#readingProgress{transition:width 0.1s}
+
+/* 搜索弹窗 */
+.search-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:300;display:none;align-items:flex-start;justify-content:center;padding-top:15vh}
+.search-modal.show{display:flex}
+.search-box{background:var(--card);border-radius:16px;width:90%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden}
+.search-header{display:flex;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.search-header input{flex:1;border:none;outline:none;font-size:16px;background:transparent;color:var(--text);padding:0 12px}
+.search-header .close{width:32px;height:32px;border:none;background:var(--hover);border-radius:50%;cursor:pointer;font-size:18px;color:var(--text-light)}
+.search-results{max-height:400px;overflow-y:auto;padding:8px}
+.search-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:0.15s}
+.search-item:hover{background:var(--hover)}
+.search-item .title{font-size:14px;font-weight:500;color:var(--text)}
+.search-item .meta{font-size:12px;color:var(--text-light)}
+.search-empty{text-align:center;padding:40px;color:var(--text-light)}
+
+
+/* 首页打字机效果 */
+.home-header{position:relative;height:300px;width:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);border-radius:var(--radius);margin-bottom:16px;overflow:hidden}
+.home-header .site-info{text-align:center;z-index:2}
+.home-header .site-info h1{font-size:2rem;color:#fff;font-weight:800;text-shadow:2px 2px 4px rgba(0,0,0,0.3)}
+.home-header .site-subtitle{font-size:1.2rem;color:rgba(255,255,255,0.9);min-height:1.5em}
+.home-header .cursor{display:inline-block;margin-left:4px;animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+/* Banner波浪动画 */
+.waves{position:absolute;bottom:0;left:0;width:100%;height:80px;overflow:hidden;z-index:3}
+.waves svg{display:block;width:100%;height:100%}
+.waves .parallax use{animation:wave 25s cubic-bezier(.55,.5,.45,.5) infinite}
+@keyframes wave{0%{transform:translateX(-90px)}100%{transform:translateX(85px)}}
+
+/* 树洞/匿名留言 */
+.tree-hole{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:var(--radius);padding:24px;margin-bottom:16px;text-align:center}
+.tree-hole h3{color:#fff;font-size:18px;margin-bottom:8px}
+.tree-hole p{color:rgba(255,255,255,0.8);font-size:13px;margin-bottom:16px}
+
+/* 表白墙 */
+.love-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:16px}
+.love-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:0.2s}
+.love-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+
+/* 时间线 */
+.timeline{position:relative;padding-left:30px}
+.timeline::before{content:'';position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:24px}
+.timeline-item::before{content:'';position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid var(--card)}
+
+/* 相册网格 */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.photo-item{border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:0.2s}
+.photo-item:hover{transform:scale(1.02)}
+.photo-item img{width:100%;height:200px;object-fit:cover}
+
+/* 项目卡片 */
+.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:16px}
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:0.2s}
+.project-card:hover{box-shadow:var(--shadow)}
+
+/* 技能条 */
+.skill-bar{margin-bottom:12px}
+.skill-bar .label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.skill-bar .bar{height:8px;background:var(--hover);border-radius:4px;overflow:hidden}
+.skill-bar .fill{height:100%;border-radius:4px;transition:width 1s ease}
+
+/* 日记 */
+.diary-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+
 </style>
 </head>
 <body>
@@ -237,7 +434,7 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
   <nav class="navbar">
     <div class="container navbar-inner">
       <a href="/" class="logo"><img id="siteLogo" src="/img/logo.png" onerror="this.remove()"> <span id="siteName">YS论坛</span></a>
-      <div class="nav-search"><i class="fa-solid fa-search"></i><input id="searchInput" placeholder="搜索帖子..." onkeydown="if(event.key==='Enter')doSearch()"></div>
+      <div class="nav-search" onclick="openSearchModal()" style="cursor:pointer"><i class="fa-solid fa-search"></i><input id="searchInput" placeholder="搜索帖子..." readonly style="cursor:pointer"></div>
       <div class="nav-right">
         <button class="nav-btn" onclick="toggleTheme()" id="themeBtn"><i class="fa-solid fa-moon"></i></button>
         <button class="nav-btn" onclick="location.href='/chat'"><i class="fa-solid fa-envelope"></i></button>
@@ -247,6 +444,41 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
       </div>
     </div>
   </nav>
+
+<!-- 搜索弹窗 -->
+<div class="search-modal" id="searchModal">
+  <div class="search-box">
+    <div class="search-header">
+      <i class="fa-solid fa-search" style="color:var(--text-light)"></i>
+      <input id="searchModalInput" placeholder="搜索帖子、标签、用户..." oninput="debounceSearch()">
+      <button class="close" onclick="closeSearchModal()"><i class="fa-solid fa-times"></i></button>
+    </div>
+    <div class="search-results" id="searchResults">
+      <div class="search-empty">输入关键词开始搜索</div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- 搜索弹窗 -->
+  <div class="search-modal" id="searchModal">
+    <div class="search-box">
+      <div class="search-header">
+        <i class="fa-solid fa-search" style="color:var(--text-light)"></i>
+        <input id="searchModalInput" placeholder="搜索帖子、标签、用户..." oninput="debounceSearch()">
+        <button class="close" onclick="closeSearchModal()"><i class="fa-solid fa-times"></i></button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-empty">输入关键词开始搜索</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 阅读进度条 -->
+  <div class="reading-progress" id="readingProgress" style="width:0%"></div>
+
+  <!-- 樱花画布 -->
+  <canvas id="sakura-canvas"></canvas>
 
   <div class="cat-nav"><div class="container cat-nav-inner" id="catNav"><a href="#" class="active" onclick="setCategory("",this);return false">全部</a></div></div>
 
@@ -260,6 +492,23 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
       <button class="carousel-btn prev" onclick="carouselPrev()"><i class="fa-solid fa-chevron-left"></i></button>
       <button class="carousel-btn next" onclick="carouselNext()"><i class="fa-solid fa-chevron-right"></i></button>
       <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </div>
+
+  
+  <!-- 首页头部 -->
+  <div class="container">
+    <div class="home-header">
+      <div class="site-info">
+        <h1>🌸 YS工作室博客论坛</h1>
+        <div class="site-subtitle"><span id="typingText"></span><span class="cursor">|</span></div>
+      </div>
+      <div class="waves">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+          <defs><path id="wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path></defs>
+          <g class="parallax"><use href="#wave" x="48" y="0" fill="rgba(255,255,255,0.7)"></use><use href="#wave" x="48" y="3" fill="rgba(255,255,255,0.5)"></use><use href="#wave" x="48" y="5" fill="rgba(255,255,255,0.3)"></use><use href="#wave" x="48" y="7" fill="#fff"></use></g>
+        </svg>
+      </div>
     </div>
   </div>
 
@@ -325,6 +574,32 @@ textarea.form-input{min-height:120px;resize:vertical;font-family:inherit}
         <div class="sb-card-body" id="friendLinks"><p style="color:var(--text-light);font-size:12px">暂无</p></div>
         <div style="padding:0 16px 12px">
           <button onclick="openModal('friendLinkModal')" style="width:100%;padding:8px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer">🔗 申请友链</button>
+        </div>
+      </div>
+
+      
+      <div class="sb-card">
+        <div class="sb-card-header"><i class="fa-solid fa-tree"></i> 树洞</div>
+        <div class="sb-card-body">
+          <div class="tree-hole">
+            <h3>🌳 匿名树洞</h3>
+            <p>说出你的心里话，没有人知道是你</p>
+            <div style="display:flex;gap:8px;max-width:100%">
+              <input id="treeHoleInput" class="form-input" placeholder="写下你想说的话..." style="flex:1;font-size:13px">
+              <button onclick="submitTreeHole()" style="padding:8px 16px;background:#fff;color:var(--primary);border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">发送</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-card">
+        <div class="sb-card-header"><i class="fa-solid fa-heart"></i> 表白墙</div>
+        <div class="sb-card-body">
+          <div style="margin-bottom:8px">
+            <input id="loveTo" class="form-input" placeholder="写给谁？（选填）" style="font-size:13px;margin-bottom:8px">
+            <textarea id="loveMessage" class="form-input" rows="3" placeholder="写下你的表白..." style="font-size:13px"></textarea>
+          </div>
+          <button onclick="submitLoveWall()" style="width:100%;padding:8px;background:linear-gradient(135deg,#ec4899,#f43f5e);color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">💝 发送表白</button>
         </div>
       </div>
 
@@ -582,8 +857,156 @@ function submitFriendLink(){
 function renderPag(pag){var c=$('pagination');if(!pag||pag.totalPages<=1){c.innerHTML='';return;}var h='';if(pag.page>1)h+='<button onclick="goPage('+(pag.page-1)+')">上一页</button>';for(var i=Math.max(1,pag.page-2);i<=Math.min(pag.totalPages,pag.page+2);i++){var active=i===pag.page;h+='<button class="'+(active?'active':'')+'" onclick="goPage('+i+')">'+i+'</button>';}if(pag.page<pag.totalPages)h+='<button onclick="goPage('+(pag.page+1)+')">下一页</button>';c.innerHTML=h;}
 function goPage(p){PAGE=p;loadPosts(true);window.scrollTo({top:0,behavior:'smooth'});}
 $('mainPage').style.display='block';
-loadCategories();loadBlogPosts(true);loadSidebar();loadAnnouncements();loadSiteFooter();
+loadCategories();loadBlogPosts(true);loadSidebar();loadAnnouncements();loadSiteFooter();setTimeout(typeWriter,1000);
 if(TOKEN){api('GET','/api/auth/me',null,function(err,d){if(err||d.code!==200||!d.data.user){localStorage.removeItem('token');TOKEN=null;} else { USER=d.data.user;enterSite();}});}
+
+// === 新增功能 ===
+
+// 樱花特效
+var sakuraCanvas = document.getElementById('sakura-canvas');
+if (sakuraCanvas) {
+  var ctx = sakuraCanvas.getContext('2d');
+  var petals = [];
+  function resizeCanvas() { sakuraCanvas.width = window.innerWidth; sakuraCanvas.height = window.innerHeight; }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  
+  function createPetal() {
+    return {
+      x: Math.random() * sakuraCanvas.width,
+      y: -20,
+      size: Math.random() * 8 + 4,
+      speedX: Math.random() * 2 - 1,
+      speedY: Math.random() * 1 + 0.5,
+      rotation: Math.random() * 360,
+      rotationSpeed: Math.random() * 2 - 1,
+      opacity: Math.random() * 0.6 + 0.4
+    };
+  }
+  
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation * Math.PI / 180);
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = '#ffb7c5';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(p.size/2, -p.size, p.size, -p.size/2, p.size, 0);
+    ctx.bezierCurveTo(p.size, p.size/2, p.size/2, p.size, 0, 0);
+    ctx.fill();
+    ctx.restore();
+  }
+  
+  function animatePetals() {
+    ctx.clearRect(0, 0, sakuraCanvas.width, sakuraCanvas.height);
+    if (Math.random() < 0.03) petals.push(createPetal());
+    for (var i = petals.length - 1; i >= 0; i--) {
+      var p = petals[i];
+      p.x += p.speedX;
+      p.y += p.speedY;
+      p.rotation += p.rotationSpeed;
+      drawPetal(p);
+      if (p.y > sakuraCanvas.height || p.x < -20 || p.x > sakuraCanvas.width + 20) {
+        petals.splice(i, 1);
+      }
+    }
+    requestAnimationFrame(animatePetals);
+  }
+  animatePetals();
+}
+
+// 阅读进度条
+window.addEventListener('scroll', function() {
+  var progress = document.getElementById('readingProgress');
+  if (progress) {
+    var scrollTop = window.scrollY;
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progress.style.width = percent + '%';
+  }
+});
+
+// 搜索弹窗
+function openSearchModal() {
+  var modal = document.getElementById('searchModal');
+  if (modal) { modal.classList.add('show'); document.getElementById('searchModalInput').focus(); }
+}
+function closeSearchModal() {
+  var modal = document.getElementById('searchModal');
+  if (modal) { modal.classList.remove('show'); }
+}
+var searchTimer = null;
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(function() {
+    var q = document.getElementById('searchModalInput').value.trim();
+    if (!q) { document.getElementById('searchResults').innerHTML = '<div class="search-empty">输入关键词开始搜索</div>'; return; }
+    api('GET', '/api/posts?search=' + encodeURIComponent(q) + '&limit=10', null, function(err, d) {
+      if (err || d.code !== 200) { document.getElementById('searchResults').innerHTML = '<div class="search-empty">搜索失败</div>'; return; }
+      if (!d.data.posts.length) { document.getElementById('searchResults').innerHTML = '<div class="search-empty">未找到相关帖子</div>'; return; }
+      var html = '';
+      d.data.posts.forEach(function(p) {
+        html += '<div class="search-item" onclick="closeSearchModal();openDetail(\'' + p.id + '\')"><div><div class="title">' + esc(p.title) + '</div><div class="meta">' + esc(p.author_name || '匿名') + ' · ' + timeAgo(p.created_at) + '</div></div></div>';
+      });
+      document.getElementById('searchResults').innerHTML = html;
+    });
+  }, 300);
+}
+
+
+
+// 打字机效果
+var typingTexts = ['分享你的想法', '记录美好生活', '技术交流社区', '温暖的知识社区'];
+var typingIndex = 0, charIndex = 0, isDeleting = false;
+function typeWriter() {
+  var el = document.getElementById('typingText');
+  if (!el) return;
+  var currentText = typingTexts[typingIndex];
+  if (isDeleting) {
+    el.textContent = currentText.substring(0, charIndex - 1);
+    charIndex--;
+  } else {
+    el.textContent = currentText.substring(0, charIndex + 1);
+    charIndex++;
+  }
+  var speed = isDeleting ? 50 : 100;
+  if (!isDeleting && charIndex === currentText.length) { speed = 2000; isDeleting = true; }
+  else if (isDeleting && charIndex === 0) { isDeleting = false; typingIndex = (typingIndex + 1) % typingTexts.length; speed = 500; }
+  setTimeout(typeWriter, speed);
+}
+
+// 树洞留言
+function submitTreeHole() {
+  var input = document.getElementById('treeHoleInput');
+  if (!input || !input.value.trim()) { toast('请输入留言内容'); return; }
+  api('POST', '/api/posts', { title: '树洞留言', content: input.value.trim(), isAnonymous: true, categoryId: '' }, function(err, d) {
+    if (err || d.code !== 200) { toast(d && d.message || '提交失败'); return; }
+    toast('留言已提交', true);
+    input.value = '';
+  });
+}
+
+// 表白墙
+function submitLoveWall() {
+  var msg = document.getElementById('loveMessage').value.trim();
+  var to = document.getElementById('loveTo').value.trim();
+  if (!msg) { toast('请输入表白内容'); return; }
+  api('POST', '/api/posts', { title: '表白墙: ' + (to || '匿名'), content: msg, isAnonymous: true, categoryId: '' }, function(err, d) {
+    if (err || d.code !== 200) { toast(d && d.message || '提交失败'); return; }
+    toast('表白已提交', true);
+    document.getElementById('loveMessage').value = '';
+    document.getElementById('loveTo').value = '';
+  });
+}
+
+
 </script>
+
+<!-- 樱花画布 -->
+<canvas id="sakura-canvas"></canvas>
+<!-- 阅读进度条 -->
+<div id="readingProgress" style="position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));z-index:9999;width:0%"></div>
+
 </body>
 </html>
