@@ -1,0 +1,59 @@
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+const { db } = require('./database');
+const { SECRET } = require('./middleware/auth');
+const onlineUsers = new Map();
+
+function setupSocket(io) {
+  io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) return next(new Error('认证失败'));
+    try {
+      const d = jwt.verify(token, SECRET);
+      const u = db.prepare('SELECT id,username,nickname,avatar,role,status FROM users WHERE id=?').get(d.id);
+      if (!u || u.status === 'banned') return next(new Error('无效'));
+      socket.user = u; next();
+    } catch (e) { next(new Error('认证失败')); }
+  });
+
+  io.on('connection', (socket) => {
+    const uid = socket.user.id;
+    if (!onlineUsers.has(uid)) onlineUsers.set(uid, new Set());
+    onlineUsers.get(uid).add(socket.id);
+    socket.join(`user_${uid}`);
+    io.emit('user_online', { userId: uid, username: socket.user.username });
+
+    socket.on('send_message', (data) => {
+      try {
+        const { conversationId, content, type = 'text' } = data;
+        if (!conversationId || !content) return;
+        const c = db.prepare('SELECT * FROM conversations WHERE id=?').get(conversationId);
+        if (!c || (c.user1_id !== uid && c.user2_id !== uid)) return;
+        const rid = c.user1_id === uid ? c.user2_id : c.user1_id, id = uuidv4();
+        db.prepare('INSERT INTO messages (id,conversation_id,sender_id,receiver_id,content,type) VALUES (?,?,?,?,?,?)').run(id, conversationId, uid, rid, content, type);
+        db.prepare("UPDATE conversations SET last_message=?,last_message_at=datetime('now') WHERE id=?").run(content.substring(0, 100), conversationId);
+        const msg = db.prepare('SELECT m.*,u.nickname as sender_name,u.avatar as sender_avatar FROM messages m LEFT JOIN users u ON m.sender_id=u.id WHERE m.id=?').get(id);
+        socket.emit('message_sent', { ...msg, conversation_id: conversationId });
+        io.to(`user_${rid}`).emit('new_message', { ...msg, conversation_id: conversationId });
+      } catch (e) {}
+    });
+
+    socket.on('typing', (data) => {
+      const c = db.prepare('SELECT * FROM conversations WHERE id=?').get(data.conversationId);
+      if (c) { const rid = c.user1_id === uid ? c.user2_id : c.user1_id; io.to(`user_${rid}`).emit('user_typing', { userId: uid }); }
+    });
+
+    socket.on('mark_read', (data) => {
+      db.prepare('UPDATE messages SET is_read=1 WHERE conversation_id=? AND receiver_id=? AND is_read=0').run(data.conversationId, uid);
+      const c = db.prepare('SELECT * FROM conversations WHERE id=?').get(data.conversationId);
+      if (c) { const sid = c.user1_id === uid ? c.user2_id : c.user1_id; io.to(`user_${sid}`).emit('messages_read', { conversationId: data.conversationId }); }
+    });
+
+    socket.on('disconnect', () => {
+      const s = onlineUsers.get(uid);
+      if (s) { s.delete(socket.id); if (!s.size) { onlineUsers.delete(uid); io.emit('user_offline', { userId: uid }); } }
+    });
+  });
+}
+
+module.exports = { setupSocket, onlineUsers };

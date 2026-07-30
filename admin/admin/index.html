@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>管理员后台 - YS论坛</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#1d1d1f}
+.sidebar{width:220px;background:#fff;border-right:1px solid #e5e5ea;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f2f2f7;font-weight:700;font-size:15px}
+.sidebar-nav{flex:1;padding:8px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13px;color:#636366;cursor:pointer;transition:0.15s;margin-bottom:2px}
+.nav-item:hover{background:#f5f5f7;color:#1d1d1f}.nav-item.active{background:linear-gradient(135deg,#5e5ce6,#6366f1);color:#fff}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.sidebar-footer{padding:8px;border-top:1px solid #f2f2f7}
+.main{margin-left:220px;min-height:100vh;background:#f0f2f5}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);border-bottom:1px solid #e5e5ea;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.content{padding:24px}.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px}
+.stat-value{font-size:22px;font-weight:700}.stat-label{font-size:11px;color:#8e8e93}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}.data-table th,.data-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #f2f2f7}.data-table th{font-size:11px;font-weight:600;color:#8e8e93;background:#fafafa}.data-table tr:hover{background:#fafafa}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500}
+.badge-green{background:#e8fde8;color:#34c759}.badge-orange{background:#fff3e0;color:#ff9500}.badge-red{background:#fce4ec;color:#ff2d55}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer}
+.btn-primary{background:#5e5ce6;color:#fff}.btn-danger{background:#ff3b5c;color:#fff}.btn-ghost{background:#f2f2f7;color:#1d1d1f}
+.actions{display:flex;gap:4px}
+.form-input{width:100%;padding:9px 12px;border:1px solid #e5e5ea;border-radius:8px;font-size:13px;outline:none}
+.toast-area{position:fixed;top:72px;right:24px;z-index:999;pointer-events:none}
+.toast-item{background:#fff;padding:10px 18px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.08);font-size:13px;margin-bottom:6px;animation:fadeUp 0.3s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.sidebar{transform:translateX(-100%);transition:transform 0.3s}.sidebar.open{transform:translateX(0)}.main{margin-left:0}}</style>
+</head><body>
+<div id="loginPage" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a1a;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;width:400px;height:400px;background:#5e5ce6;border-radius:50%;filter:blur(80px);opacity:0.6;top:-10%;left:-5%;animation:orbFloat 8s ease-in-out infinite"></div><div style="position:absolute;width:350px;height:350px;background:#6366f1;border-radius:50%;filter:blur(80px);opacity:0.6;bottom:-10%;right:-5%;animation:orbFloat 8s ease-in-out infinite 2s"></div></div>
+  <style>@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-30px) scale(1.1)}50%{transform:translate(-20px,20px) scale(0.9)}75%{transform:translate(20px,10px) scale(1.05)}}</style>
+  <div style="position:relative;z-index:2;display:flex;width:900px;max-width:95vw;min-height:480px;border-radius:24px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
+    <div style="flex:1;background:linear-gradient(135deg,#5e5ce6,#6366f1,#818cf8);padding:48px 36px;display:flex;flex-direction:column;justify-content:center"><div style="font-size:48px;margin-bottom:16px">🔧</div><h1 style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px">管理员后台</h1><p style="font-size:14px;color:rgba(255,255,255,0.85)">YS工作室博客论坛内容管理系统</p><div style="margin-top:24px"><div style="color:rgba(255,255,255,0.9);font-size:13px;padding:4px 0">✅ 帖子与评论管理</div><div style="color:rgba(255,255,255,0.9);font-size:13px;padding:4px 0">✅ 举报处理</div><div style="color:rgba(255,255,255,0.9);font-size:13px;padding:4px 0">✅ 私信管理</div></div></div>
+    <div style="flex:1;background:rgba(15,15,35,0.95);padding:48px 36px;display:flex;flex-direction:column;justify-content:center">
+      <h2 style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">欢迎回来 👋</h2>
+      <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:28px">登录管理员后台</p>
+      <div style="margin-bottom:16px"><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px">账号</label><div style="position:relative"><input id="adminUser" style="width:100%;padding:12px 14px 12px 42px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:14px;outline:none" placeholder="请输入账号"><i class="fa-solid fa-user" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3)"></i></div></div>
+      <div style="margin-bottom:20px"><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px">密码</label><div style="position:relative"><input id="adminPass" type="password" style="width:100%;padding:12px 14px 12px 42px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:14px;outline:none" placeholder="请输入密码"><i class="fa-solid fa-lock" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3)"></i></div></div>
+      <button onclick="doLogin()" style="width:100%;padding:13px;background:linear-gradient(135deg,#5e5ce6,#6366f1);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">登 录</button>
+      <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.5);text-align:center">超级管理员请前往 <a href="/admin/super/" style="color:#818cf8">超管后台</a></p>
+    </div>
+  </div>
+</div>
+<div id="adminApp" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">🔧 <span>管理员</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i>工作台</div>
+      <div class="nav-item" data-page="posts"><i class="fa-solid fa-heart"></i>帖子管理</div>
+      <div class="nav-item" data-page="comments"><i class="fa-solid fa-comments"></i>评论管理</div>
+      <div class="nav-item" data-page="reports"><i class="fa-solid fa-flag"></i>举报处理</div>
+      <div class="nav-item" data-page="chats"><i class="fa-solid fa-message"></i>私信管理</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="window.open('/')"><i class="fa-solid fa-arrow-up-right-from-square"></i>访问前台</div>
+      <div class="nav-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i>退出</div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div style="display:flex;align-items:center;gap:10px"><button onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;background:none;border:none;font-size:20px;cursor:pointer" class="menu-btn"><i class="fa-solid fa-bars"></i></button><span style="font-size:16px;font-weight:700" id="pageTitle">工作台</span></div><div style="display:flex;align-items:center;gap:8px"><span id="adminName"></span><span style="font-size:11px;padding:2px 8px;border-radius:6px;background:#e8f4fd;color:#5e5ce6">🔧 管理员</span></div></header>
+    <div class="content">
+      <div class="page active" id="page-dashboard"><h2 style="font-size:18px;margin-bottom:18px">📊 工作台</h2><div class="stats-grid" id="statsGrid"></div><div class="card"><h3 style="font-size:15px;margin-bottom:12px">最新帖子</h3><div id="recentPosts"></div></div></div>
+      <div class="page" id="page-posts"><div style="display:flex;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px"><h2 style="font-size:18px">💕 帖子管理</h2><select id="postFilter" onchange="loadPosts()" class="form-input" style="width:auto"><option value="">全部</option><option value="published">已发布</option><option value="pending">待审核</option></select></div><div class="card"><div id="postsTable"></div></div><div id="postsPag" style="display:flex;justify-content:center;gap:6px;margin-top:14px"></div></div>
+      <div class="page" id="page-comments"><h2 style="font-size:18px;margin-bottom:18px">💬 评论管理</h2><div class="card"><div id="commentsTable"></div></div></div>
+      <div class="page" id="page-reports"><h2 style="font-size:18px;margin-bottom:18px">🚩 举报处理</h2><div class="card"><div id="reportsTable"></div></div></div>
+      <div class="page" id="page-chats"><h2 style="font-size:18px;margin-bottom:18px">💬 私信管理</h2><div class="card"><div id="chatsTable"></div></div><div id="chatDetail" class="card" style="display:none;margin-top:14px"><h3 style="font-size:15px;margin-bottom:10px">会话详情</h3><div id="chatMessages" style="max-height:280px;overflow-y:auto;margin-bottom:10px"></div><div style="display:flex;gap:8px"><input id="interveneInput" class="form-input" placeholder="输入管理员消息..." style="flex:1"><button onclick="sendIntervene()" style="padding:8px 14px;background:#5e5ce6;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">介入</button></div></div></div>
+    </div>
+  </main>
+</div>
+<div class="toast-area" id="toastArea"></div>
+<script>
+var API='',TOKEN=localStorage.getItem('admin_token')||null,adminUser=null;
+document.querySelectorAll('.nav-item[data-page]').forEach(function(n){n.addEventListener('click',function(){document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});n.classList.add('active');document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});document.getElementById('page-'+n.dataset.page).classList.add('active');document.getElementById('pageTitle').textContent=n.textContent.trim();loadPage(n.dataset.page);document.getElementById('sidebar').classList.remove('open');});});
+function doLogin(){var u=document.getElementById('adminUser').value,p=document.getElementById('adminPass').value;if(!u||!p)return showT('请输入账号密码','error');api('POST','/api/auth/login',{username:u,password:p},function(err,d){if(err||d.code!==200){showT(d&&d.message||'登录失败','error');return;}if(!['admin','super_admin'].includes(d.data.user.role)){showT('没有管理权限','error');return;}if(d.data.user.role==='super_admin'){showT('超管请前往超管后台','error');return;}TOKEN=d.data.token;localStorage.setItem('admin_token',TOKEN);adminUser=d.data.user;showApp();});}
+function showApp(){document.getElementById('loginPage').style.display='none';document.getElementById('adminApp').style.display='block';document.getElementById('adminName').textContent=adminUser.nickname;loadPage('dashboard');}
+function logout(){TOKEN=null;localStorage.removeItem('admin_token');location.reload();}
+function loadPage(p){var fn={dashboard:loadDashboard,posts:loadPosts,comments:loadComments,reports:loadReports,chats:loadChats};if(fn[p])fn[p]();}
+function api(m,u,d,cb){var h={'Content-Type':'application/json'};if(TOKEN)h['Authorization']='Bearer '+TOKEN;var r=new XMLHttpRequest();r.open(m,u,true);for(var k in h)r.setRequestHeader(k,h[k]);r.onreadystatechange=function(){if(r.readyState===4)try{var j=JSON.parse(r.responseText);cb(null,j);}catch(e){cb('解析失败');}};r.onerror=function(){cb('网络错误');};r.send(d?JSON.stringify(d):null);}
+function esc(s){if(!s)return '';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function fmtDate(s){if(!s)return '-';return new Date(s+(s.indexOf('Z')>=0?'':'Z')).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function showT(m,t){var c=document.getElementById('toastArea'),d=document.createElement('div');d.className='toast-item';d.innerHTML='<i class="fa-solid fa-circle-'+(t==='success'?'check':'exclamation')+'" style="color:'+(t==='success'?'#34c759':'#ff3b5c')+';margin-right:6px"></i>'+m;c.appendChild(d);setTimeout(function(){d.remove();},3000);}
+function renderPag(id,pag,fn){var c=document.getElementById(id);if(!pag||pag.totalPages<=1){c.innerHTML='';return;}var h='';if(pag.page>1)h+='<button class="btn btn-ghost" onclick="'+fn+'('+(pag.page-1)+')">上页</button>';for(var i=Math.max(1,pag.page-2);i<=Math.min(pag.totalPages,pag.page+2);i++)h+='<button class="btn '+(i===pag.page?'btn-primary':'btn-ghost')+'" onclick="'+fn+'('+i+')">'+i+'</button>';if(pag.page<pag.totalPages)h+='<button class="btn btn-ghost" onclick="'+fn+'('+(pag.page+1)+')">下页</button>';c.innerHTML=h;}
+
+function loadDashboard(){api('GET','/api/admin/stats',null,function(err,d){if(err||d.code!==200)return;var s=d.data.stats;document.getElementById('statsGrid').innerHTML='<div class="stat-card"><div class="stat-icon" style="background:#e8f4fd;color:#5e5ce6"><i class="fa-solid fa-users"></i></div><div class="stat-value">'+s.totalUsers+'</div><div class="stat-label">用户</div></div><div class="stat-card"><div class="stat-icon" style="background:#fce4ec;color:#ec4899"><i class="fa-solid fa-heart"></i></div><div class="stat-value">'+s.totalPosts+'</div><div class="stat-label">帖子</div></div><div class="stat-card"><div class="stat-icon" style="background:#e8fde8;color:#34c759"><i class="fa-solid fa-comments"></i></div><div class="stat-value">'+s.totalComments+'</div><div class="stat-label">评论</div></div><div class="stat-card"><div class="stat-icon" style="background:#fff3e0;color:#ff9500"><i class="fa-solid fa-flag"></i></div><div class="stat-value">'+s.pendingReports+'</div><div class="stat-label">举报</div></div>';document.getElementById('recentPosts').innerHTML=d.data.recentPosts.length?'<table class="data-table"><thead><tr><th>标题</th><th>作者</th><th>状态</th><th>时间</th></tr></thead><tbody>'+d.data.recentPosts.map(function(p){return '<tr><td>'+esc(p.title)+'</td><td>'+esc(p.nickname)+'</td><td><span class="badge '+(p.status==='published'?'badge-green':'badge-orange')+'">'+p.status+'</span></td><td>'+fmtDate(p.created_at)+'</td></tr>';}).join('')+'</tbody></table>':'<p style="color:#8e8e93;text-align:center;padding:20px">暂无</p>';});}
+
+var pp=1;function loadPosts(page){if(!page)page=1;pp=page;var st=document.getElementById('postFilter').value;var url='/api/admin/posts?page='+page+'&limit=15';if(st)url+='&status='+st;api('GET',url,null,function(err,d){if(err||d.code!==200)return;document.getElementById('postsTable').innerHTML='<table class="data-table"><thead><tr><th>标题</th><th>作者</th><th>状态</th><th>操作</th></tr></thead><tbody>'+d.data.posts.map(function(p){return '<tr><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.title)+'</td><td>'+esc(p.author_name||'')+'</td><td><span class="badge '+(p.status==='published'?'badge-green':'badge-orange')+'">'+p.status+'</span></td><td class="actions">'+(p.status==='pending'?'<button class="btn btn-primary" onclick="updatePost(\''+p.id+'\',\'published\')">通过</button>':'')+(p.status==='published'?'<button class="btn btn-ghost" onclick="updatePost(\''+p.id+'\',\'hidden\')">隐藏</button>':'')+'<button class="btn btn-ghost" onclick="essPost(\''+p.id+'\','+(p.is_essence?0:1)+')">'+(p.is_essence?'取消精华':'精华')+'</button><button class="btn btn-danger" onclick="deletePost(\''+p.id+'\')">删除</button></td></tr>';}).join('')+'</tbody></table>';renderPag('postsPag',d.data.pagination,'loadPosts');});}
+function updatePost(id,st){api('PUT','/api/admin/posts/'+id+'/status',{status:st},function(err,d){if(err||d.code!==200){showT(d&&d.message||'失败','error');return;}showT('已更新');loadPosts(pp);});}
+function essPost(id,v){api('PUT','/api/admin/posts/'+id+'/essence',{essence:v},function(err,d){if(err||d.code!==200){showT('失败','error');return;}showT(v?'已加精':'已取消');loadPosts(pp);});}
+function deletePost(id){if(!confirm('确定删除？'))return;api('DELETE','/api/admin/posts/'+id,null,function(err,d){if(err||d.code!==200){showT('失败','error');return;}showT('已删除');loadPosts(pp);});}
+
+function loadComments(){api('GET','/api/admin/comments?limit=20',null,function(err,d){if(err||d.code!==200)return;document.getElementById('commentsTable').innerHTML=d.data.comments.length?'<table class="data-table"><thead><tr><th>内容</th><th>作者</th><th>帖子</th><th>操作</th></tr></thead><tbody>'+d.data.comments.map(function(c){return '<tr><td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.content)+'</td><td>'+esc(c.author_name)+'</td><td>'+esc(c.post_title||'')+'</td><td><button class="btn btn-danger" onclick="deleteComment(\''+c.id+'\')">删除</button></td></tr>';}).join('')+'</tbody></table>':'<p style="color:#8e8e93;text-align:center;padding:20px">暂无</p>';});}
+function deleteComment(id){if(!confirm('确定？'))return;api('DELETE','/api/admin/comments/'+id,null,function(err,d){if(err||d.code!==200){showT('失败','error');return;}showT('已删除');loadComments();});}
+
+function loadReports(){api('GET','/api/admin/reports?status=pending',null,function(err,d){if(err||d.code!==200)return;document.getElementById('reportsTable').innerHTML=d.data.reports.length?'<table class="data-table"><thead><tr><th>举报人</th><th>原因</th><th>时间</th><th>操作</th></tr></thead><tbody>'+d.data.reports.map(function(r){return '<tr><td>'+esc(r.reporter_name)+'</td><td>'+esc(r.reason)+'</td><td>'+fmtDate(r.created_at)+'</td><td class="actions"><button class="btn btn-primary" onclick="resolveReport(\''+r.id+'\',\'resolved\')">处理</button><button class="btn btn-ghost" onclick="resolveReport(\''+r.id+'\',\'dismissed\')">驳回</button></td></tr>';}).join('')+'</tbody></table>':'<p style="color:#8e8e93;text-align:center;padding:20px">暂无</p>';});}
+function resolveReport(id,st){api('PUT','/api/admin/reports/'+id,{status:st},function(err,d){if(err||d.code!==200){showT('失败','error');return;}showT('已处理');loadReports();});}
+
+var currentChatConvId=null;
+function loadChats(){api('GET','/api/chat/conversations',null,function(err,d){if(err||d.code!==200)return;document.getElementById('chatsTable').innerHTML=d.data.conversations.length?'<table class="data-table"><thead><tr><th>用户1</th><th>用户2</th><th>最后消息</th><th>操作</th></tr></thead><tbody>'+d.data.conversations.map(function(c){return '<tr><td>'+esc(c.user1_name||'')+'</td><td>'+esc(c.user2_name||'')+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.last_message||'')+'</td><td><button class="btn btn-primary" onclick="viewChat(\''+c.id+'\')">查看</button></td></tr>';}).join('')+'</tbody></table>':'<p style="color:#8e8e93;text-align:center;padding:20px">暂无私信</p>';});}
+function viewChat(id){currentChatConvId=id;api('GET','/api/chat/conversations/'+id+'/messages',null,function(err,d){if(err||d.code!==200)return;document.getElementById('chatDetail').style.display='block';document.getElementById('chatMessages').innerHTML=d.data.messages.map(function(m){return '<div style="margin-bottom:6px;'+(m.type==='system'?'text-align:center':'')+'"><div style="display:inline-block;padding:6px 12px;border-radius:10px;'+(m.type==='system'?'background:#fff3e0;color:#ff9500;font-size:11px':'background:#f2f2f7;color:#1d1d1f;font-size:13px')+'">'+(m.type==='system'?'🔒 系统消息':'<b>'+esc(m.sender_name)+'</b>: '+esc(m.content))+'</div></div>';}).join('');});}
+function sendIntervene(){var input=document.getElementById('interveneInput'),content=input.value.trim();if(!content||!currentChatConvId)return;api('POST','/api/chat/conversations/'+currentChatConvId+'/intervene',{content:content},function(err,d){if(err||d.code!==200){showT(d&&d.message||'失败','error');return;}input.value='';showT('已介入');viewChat(currentChatConvId);});}
+
+if(TOKEN)api('GET','/api/auth/me',null,function(err,d){if(err||d.code!==200||!['admin','super_admin'].includes(d.data.user.role)){localStorage.removeItem('admin_token');TOKEN=null;}else{adminUser=d.data.user;showApp();}});
+
+</script></body></html>
